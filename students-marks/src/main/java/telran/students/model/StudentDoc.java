@@ -18,6 +18,7 @@ public class StudentDoc {
 	long id;
 	@Setter
 	String phone;
+	@Setter
 	List<Mark> marks = new ArrayList<>();
 	public StudentDoc(Student student) {
 		id = student.id();

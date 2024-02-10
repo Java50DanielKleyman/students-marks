@@ -1,5 +1,7 @@
 package telran.students.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +19,12 @@ import telran.students.repo.StudentRepo;
 @Slf4j
 public class StudentsServiceImpl implements StudentsService {
 	final StudentRepo studentRepo;
+
 	@Override
 	@Transactional
 	public Student addStudent(Student student) {
 		long id = student.id();
-		if(studentRepo.existsById(id)) {
+		if (studentRepo.existsById(id)) {
 			log.error("student with id {} already exists", id);
 			throw new StudentIllegalStateException();
 		}
@@ -33,17 +36,21 @@ public class StudentsServiceImpl implements StudentsService {
 
 	@Override
 	public Mark addMark(long id, Mark mark) {
-		// TODO Auto-generated method stub
-		return null;
+		StudentDoc studentDoc = studentRepo.findById(id).orElseThrow(() -> new StudentNotFoundException());
+		List<Mark> marksList = studentDoc.getMarks();
+		marksList.add(mark);
+		studentDoc.setMarks(marksList);
+		studentRepo.save(studentDoc);
+		log.debug("student with id {}has new mark {}", id, mark);
+		return mark;
 	}
 
 	@Override
 	@Transactional
 	public Student updatePhoneNumber(long id, String phoneNumber) {
-		StudentDoc studentDoc = studentRepo.findById(id)
-				.orElseThrow(() -> new StudentNotFoundException());
-		log.debug("student with id {}, old phone number {}, new phone number {}",
-				id,studentDoc.getPhone(), phoneNumber);
+		StudentDoc studentDoc = studentRepo.findById(id).orElseThrow(() -> new StudentNotFoundException());
+		log.debug("student with id {}, old phone number {}, new phone number {}", id, studentDoc.getPhone(),
+				phoneNumber);
 		studentDoc.setPhone(phoneNumber);
 		Student res = studentRepo.save(studentDoc).build();
 		log.debug("Student {} has been saved ", res);
