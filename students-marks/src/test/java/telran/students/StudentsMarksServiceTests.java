@@ -1,9 +1,12 @@
 package telran.students;
 
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
@@ -18,15 +21,22 @@ import telran.students.repo.StudentRepo;
 import telran.students.service.StudentsService;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StudentsMarksServiceTests {
 	private static final String SERVICE_TEST = "Service: ";
 	private static final long ID1 = 123l;
 	private static final long ID2 = 124l;
+	private static final long ID3 = 125l;
 	private static final String PHONE1 = "0123456";
 	private static final String PHONE2 = "01234567";
+	private static final String PHONE3 = "012345678";
 	private static final String SUBJECT = "Mathematics";
 	private static final int SCORE = 95;
 	private static final LocalDate DATE = LocalDate.of(2023, 12, 31);
+
+	Student student = new Student(ID1, PHONE1);
+	Student student1 = new Student(ID3, PHONE3);
+	Mark mark = new Mark(SUBJECT, SCORE, DATE);
 
 	@Autowired
 	StudentsService studentsService;
@@ -34,16 +44,18 @@ class StudentsMarksServiceTests {
 	@Autowired
 	StudentRepo studentRepo;
 
-	Student student = new Student(ID1, PHONE1);
-	Mark mark = new Mark(SUBJECT, SCORE, DATE);
+	@BeforeAll
+	void setUp() {
+		studentsService.addStudent(student);
+	}
 
 	@Test
 	@DisplayName(SERVICE_TEST + TestDisplayNames.ADDING_STUDENT_NORMAL)
 	void addStudentNormal() {
-		Student res = studentsService.addStudent(student);
-		assertEquals(student, res);
-		StudentDoc studentDoc = studentRepo.findById(ID1).orElseThrow(() -> new StudentNotFoundException());
-		assertEquals(student, studentDoc.build());
+		Student res = studentsService.addStudent(student1);
+		assertEquals(student1, res);
+		StudentDoc studentDoc = studentRepo.findById(ID3).orElseThrow(() -> new StudentNotFoundException());
+		assertEquals(student1, studentDoc.build());
 	}
 
 	@Test
