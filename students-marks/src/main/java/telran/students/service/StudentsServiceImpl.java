@@ -1,7 +1,6 @@
 package telran.students.service;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -146,8 +145,10 @@ public class StudentsServiceImpl implements StudentsService {
 
 	@Override
 	public List<Student> getStudentsGoodSubjectMark(String subject, int markThreshold) {
-		// TODO Auto-generated method stub
-		return null;
+		List<StudentDoc> studentsDoc = studentRepo.findStudentsWithGoodSubjectMark(subject, markThreshold);
+		List<Student> students = studentsDoc.stream().map(sd -> new Student(sd.getId(), sd.getPhone())).toList();
+		log.debug("These students {} received marks on subject {} greater then {}", students, subject, markThreshold);
+		return students;
 	}
 
 }
