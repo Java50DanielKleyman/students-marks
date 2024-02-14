@@ -2,9 +2,8 @@ package telran.students;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDate;
+
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.BeforeEach;
 import static telran.students.TestDb.*;
@@ -102,5 +101,8 @@ class StudentsMarksServiceTests {
 	void getStudentsMarksDateTest() {
 		assertEquals(studentsMarksDate, studentsService.getStudentsMarksDate(DATE1));
 	}
-
+	@Test
+	void getStudentsMarksMonthYearTest() {
+		assertEquals(studentsMarksDate, studentsService.getStudentsMarksMonthYear(01, 2024));
+	}
 }

@@ -22,4 +22,7 @@ public interface StudentRepo extends MongoRepository<StudentDoc, Long> {
 
 	@Query(value = "{ 'marks' : { $elemMatch: { 'date' : ?0 } } }", fields = "{id:1, phone:1}")
 	List<StudentDoc> findStudentsWithMarksOnDate(LocalDate date);
+
+	@Query(value = "{ 'marks.date' : { $gte: ?0, $lt: ?1 } }", fields = "{id:1, phone:1}")
+	List<StudentDoc> findStudentsWithMarksOnMonthAndYear(LocalDate startDate, LocalDate endDate);
 }

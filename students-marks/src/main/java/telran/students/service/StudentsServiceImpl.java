@@ -1,6 +1,7 @@
 package telran.students.service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -129,14 +130,18 @@ public class StudentsServiceImpl implements StudentsService {
 	public List<Student> getStudentsMarksDate(LocalDate date) {
 		List<StudentDoc> studentsDoc = studentRepo.findStudentsWithMarksOnDate(date);
 		List<Student> students = studentsDoc.stream().map(sd -> new Student(sd.getId(), sd.getPhone())).toList();
-		log.debug("These students {} received marks on date {}", students, date);
+		log.debug("These students {} received marks on date {}", students, date);		
 		return students;
 	}
 
 	@Override
 	public List<Student> getStudentsMarksMonthYear(int month, int year) {
-		// TODO Auto-generated method stub
-		return null;
+		LocalDate startDate = LocalDate.of(year, month, 1);
+	    LocalDate endDate = startDate.plusMonths(1).minusDays(1);
+		List<StudentDoc> studentsDoc = studentRepo.findStudentsWithMarksOnMonthAndYear(startDate, endDate);
+		List<Student> students = studentsDoc.stream().map(sd -> new Student(sd.getId(), sd.getPhone())).toList();
+		log.debug("These students {} received marks in {} of {}", students, month, year);
+		return students;
 	}
 
 	@Override
