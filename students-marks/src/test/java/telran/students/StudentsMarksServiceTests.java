@@ -32,8 +32,11 @@ class StudentsMarksServiceTests {
 	Student studentUpdated = new Student(ID1, PHONE2);
 	Mark mark = new Mark(SUBJECT2, 70, DATE1);
 	List<Student> studentsMarksDate = List.of(students[0], students[1], students[2], students[5]);
-	List<Student> studentsGoodSubjectMarks = List.of(students[0], students[2], students[3], students[5]);
-
+	List<Student> studentsGoodSubjectMarks= List.of(students[0], students[2], students[3], students[5]);
+	List<Student> studentsGoodSubjectMarks1 = List.of(students[0], students[5]);
+	List<Student> studentsAllGoodMarks = List.of(students[4], students[5]);
+	List<Student> studentsAllGoodMarks1 = List.of(students[0], students[1],students[2], students[3], students[4], students[5]);
+	
 	@BeforeEach
 	void setUp() {
 		testDb.createDb();
@@ -110,5 +113,13 @@ class StudentsMarksServiceTests {
 	@Test
 	void getStudentsGoodSubjectMarkTest() {
 		assertEquals(studentsGoodSubjectMarks, studentsService.getStudentsGoodSubjectMark(SUBJECT1, 60));
+		assertEquals(studentsGoodSubjectMarks1, studentsService.getStudentsGoodSubjectMark(SUBJECT2, 70));
 	}
+	
+	@Test
+	void getStudentsAllGoodMarksTest() {
+		assertEquals(studentsAllGoodMarks, studentsService.getStudentsAllGoodMarks(80));
+		assertEquals(studentsAllGoodMarks1, studentsService.getStudentsAllGoodMarks(60));
+	}
+	
 }
