@@ -2,7 +2,6 @@ package telran.students;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,11 +31,14 @@ class StudentsMarksServiceTests {
 	Student studentUpdated = new Student(ID1, PHONE2);
 	Mark mark = new Mark(SUBJECT2, 70, DATE1);
 	List<Student> studentsMarksDate = List.of(students[0], students[1], students[2], students[5]);
-	List<Student> studentsGoodSubjectMarks= List.of(students[0], students[2], students[3], students[5]);
+	List<Student> studentsGoodSubjectMarks = List.of(students[0], students[2], students[3], students[5]);
 	List<Student> studentsGoodSubjectMarks1 = List.of(students[0], students[5]);
 	List<Student> studentsAllGoodMarks = List.of(students[4], students[5]);
-	List<Student> studentsAllGoodMarks1 = List.of(students[0], students[1],students[2], students[3], students[4], students[5]);
-	
+	List<Student> studentsAllGoodMarks1 = List.of(students[0], students[1], students[2], students[3], students[4],
+			students[5]);
+	List<Student> studentsFewMarks = List.of(students[3], students[4], students[6]);
+	List<Student> studentsFewMarks1 = List.of(students[0], students[1], students[3], students[4], students[6]);
+
 	@BeforeEach
 	void setUp() {
 		testDb.createDb();
@@ -105,21 +107,27 @@ class StudentsMarksServiceTests {
 	void getStudentsMarksDateTest() {
 		assertEquals(studentsMarksDate, studentsService.getStudentsMarksDate(DATE1));
 	}
+
 	@Test
 	void getStudentsMarksMonthYearTest() {
 		assertEquals(studentsMarksDate, studentsService.getStudentsMarksMonthYear(01, 2024));
 	}
-	
+
 	@Test
 	void getStudentsGoodSubjectMarkTest() {
 		assertEquals(studentsGoodSubjectMarks, studentsService.getStudentsGoodSubjectMark(SUBJECT1, 60));
 		assertEquals(studentsGoodSubjectMarks1, studentsService.getStudentsGoodSubjectMark(SUBJECT2, 70));
 	}
-	
+
 	@Test
 	void getStudentsAllGoodMarksTest() {
 		assertEquals(studentsAllGoodMarks, studentsService.getStudentsAllGoodMarks(80));
 		assertEquals(studentsAllGoodMarks1, studentsService.getStudentsAllGoodMarks(60));
 	}
-	
+
+	@Test
+	void getStudentsFewMarksTest() {
+		assertEquals(studentsFewMarks, studentsService.getStudentsFewMarks(3));
+		assertEquals(studentsFewMarks1, studentsService.getStudentsFewMarks(4));
+	}
 }

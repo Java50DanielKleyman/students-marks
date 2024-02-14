@@ -104,8 +104,10 @@ public class StudentsServiceImpl implements StudentsService {
 
 	@Override
 	public List<Student> getStudentsFewMarks(int nMarks) {
-		// Will be implemented on the CW #72
-		return null;
+		List<StudentDoc> studentsDoc = studentRepo.findStudentsWithFewMarks(nMarks);
+		List<Student> students = studentsDoc.stream().map(sd -> new Student(sd.getId(), sd.getPhone())).toList();
+		log.debug("These students {} have marks fewer then {}", students, nMarks);
+		return students;
 	}
 
 	@Override
