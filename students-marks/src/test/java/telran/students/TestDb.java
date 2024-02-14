@@ -32,7 +32,7 @@ public class TestDb {
 	static final String PHONE4 = "054-1234567";
 	static final String PHONE5 = "055-1234567";
 	static final String PHONE6 = "056-1234567";
-	static final String PHONE7 = "051-1234567";
+	static final String PHONE7 = "051-1234568";
 	//Subjects
 	static final String SUBJECT1 = "Subject1";
 	static final String SUBJECT2 = "Subject2";

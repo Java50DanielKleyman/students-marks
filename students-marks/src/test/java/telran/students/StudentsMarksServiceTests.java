@@ -29,6 +29,7 @@ class StudentsMarksServiceTests {
 	static final long ID8 = 8;	
 	static final String PHONE8 = "058-1234567";
 	Student student8 = new Student(ID8, PHONE8);
+	Student studentUpdated = new Student(ID1, PHONE2);
 	Mark mark = new Mark(SUBJECT2,70,DATE1);
 	
 	@BeforeEach
@@ -47,8 +48,7 @@ class StudentsMarksServiceTests {
 	@Test
 
 	void updatePhoneNumberTest() {
-		//FIXME according to TestDb
-		Student studentUpdated = new Student(ID1, PHONE2);
+		//FIXME according to TestDb		
 		assertEquals(studentUpdated, studentsService.updatePhoneNumber(ID1, PHONE2));
 		assertEquals(studentUpdated, studentRepo.findById(ID1).orElseThrow().build());
 		assertThrowsExactly(StudentNotFoundException.class,
