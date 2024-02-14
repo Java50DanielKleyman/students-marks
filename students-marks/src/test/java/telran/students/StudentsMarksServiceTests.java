@@ -29,7 +29,7 @@ class StudentsMarksServiceTests {
 	static final long ID8 = 8;	
 	static final String PHONE8 = "058-1234567";
 	Student student8 = new Student(ID8, PHONE8);
-	
+	Mark mark = new Mark(SUBJECT2,70,DATE1);
 	
 	@BeforeEach
 	void setUp() {
@@ -48,21 +48,21 @@ class StudentsMarksServiceTests {
 
 	void updatePhoneNumberTest() {
 		//FIXME according to TestDb
-		Student expected = new Student(ID1, PHONE2);
-		assertEquals(expected, studentsService.updatePhoneNumber(ID1, PHONE2));
-//		assertEquals(studentUpdated, studentRepo.findById(ID1).orElseThrow().build());
-//		assertThrowsExactly(StudentNotFoundException.class,
-//				()->studentsService.updatePhoneNumber(ID1 + 1000, PHONE2));
+		Student studentUpdated = new Student(ID1, PHONE2);
+		assertEquals(studentUpdated, studentsService.updatePhoneNumber(ID1, PHONE2));
+		assertEquals(studentUpdated, studentRepo.findById(ID1).orElseThrow().build());
+		assertThrowsExactly(StudentNotFoundException.class,
+				()->studentsService.updatePhoneNumber(ID1 + 1000, PHONE2));
 	}
 	@Test
 	
 	void addMarkTest() {
 		//FIXME according to TestDb
-//		assertFalse(studentRepo.findById(ID1).orElseThrow().getMarks().contains(mark));
-//		assertEquals(mark, studentsService.addMark(ID1, mark));
-//		assertTrue(studentRepo.findById(ID1).orElseThrow().getMarks().contains(mark));
-//		assertThrowsExactly(StudentNotFoundException.class,
-//				()->studentsService.addMark(ID1 + 1000, mark));
+		assertFalse(studentRepo.findById(ID1).orElseThrow().getMarks().contains(mark));
+		assertEquals(mark, studentsService.addMark(ID1, mark));
+		assertTrue(studentRepo.findById(ID1).orElseThrow().getMarks().contains(mark));
+		assertThrowsExactly(StudentNotFoundException.class,
+				()->studentsService.addMark(ID1 + 1000, mark));
 		
 	}
 	@Test
