@@ -142,7 +142,8 @@ public class StudentsServiceImpl implements StudentsService {
 	public List<Student> getStudentsMarksMonthYear(int month, int year) {
 		LocalDate startDate = LocalDate.of(year, month, 1);
 		LocalDate endDate = startDate.plusMonths(1).minusDays(1);
-		List<StudentDoc> studentsDoc = studentRepo.findStudentsWithMarksOnMonthAndYear(startDate, endDate);
+		List<StudentDoc> studentsDoc = studentRepo.findStudentsWithMarksOnMonthAndYear(month, year);
+//		List<StudentDoc> studentsDoc = studentRepo.findStudentsWithMarksOnMonthAndYear(startDate, endDate);
 		List<Student> students = studentsDoc.stream().map(sd -> new Student(sd.getId(), sd.getPhone())).toList();
 		log.debug("These students {} received marks in {} of {}", students, month, year);
 		return students;
