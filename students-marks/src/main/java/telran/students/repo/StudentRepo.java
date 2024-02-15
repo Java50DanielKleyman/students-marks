@@ -32,6 +32,6 @@ public interface StudentRepo extends MongoRepository<StudentDoc, Long> {
 	@Query(value = "{ 'marks' : {$elemMatch: { 'score' : {$gt: ?0}} }}", fields = "{id:1, phone:1}")
 	List<StudentDoc> findStudentsWithAllGoodMarks(int markThreshold);
 
-	@Query(value = "{ 'marks' : {$size : {$lt : ?0} }}", fields = "{id:1, phone:1}")
+	@Query(value = "{ $expr: { $lt: [ { $size: '$marks' }, ?0 ] } }", fields = "{id:1, phone:1}")
 	List<StudentDoc> findStudentsWithFewMarks(int nMarks);
 }
