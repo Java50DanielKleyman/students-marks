@@ -41,5 +41,12 @@ public interface StudentRepo extends MongoRepository<StudentDoc, Long> {
 	        "]" +
 	        "}")
 	List<IdPhone> findAllGoodMarksSubject(String subject, int thresholdScore);
+	
+	@Query("{$expr:{$and: ["
+			+ "{$gt:[{$size:$marks}, ?0]},"
+			+ "{$lt:[{$size:$marks}, ?1]}"
+			+ "]"
+			+ "}}")
+	List<IdPhone> findStudentsMarksAmountBetween(int min, int max);
 
 }
