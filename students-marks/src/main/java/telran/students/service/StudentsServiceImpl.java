@@ -3,7 +3,6 @@ package telran.students.service;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bson.Document;
@@ -13,6 +12,8 @@ import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort.NullHandling;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -265,7 +266,7 @@ public class StudentsServiceImpl implements StudentsService {
 		var aggregationResult = mongoTemplate.aggregate(pipeline, StudentDoc.class, Document.class);
 		List<Document> documents = aggregationResult.getMappedResults();
 		List<Long> res = documents.stream().map(d -> d.getLong("_id")).toList();
-		log.debug("bets {} students with most scores greater than 80 are {}", nStudents, res);
+		log.debug("best {} students with most scores greater than 80 are {}", nStudents, res);
 		return res;
 	}
 
@@ -278,7 +279,18 @@ public class StudentsServiceImpl implements StudentsService {
 		// (with AccumulatorOperators.Sum) and
 		// ProjectionOperation for adding new fields with computed values from
 		// AggregationExpression
-		return null;
-	}
 
+		UnwindOperation unwindOperation = Aggregation.unwind("marks", true);
+		AggregationExpression sumExpression = AccumulatorOperators.Sum.sumOf("marks.score");
+		ProjectionOperation projectOperation = Aggregation.project("id").and(sumExpression).as("TotalScore");
+		SortOperation sortOperation = Aggregation.sort(Direction.ASC, "TotalScore");
+		LimitOperation limitOperation = Aggregation.limit(nStudents);
+		Aggregation pipeline = Aggregation.newAggregation(unwindOperation, projectOperation, sortOperation,
+				limitOperation);
+		var aggregationResult = mongoTemplate.aggregate(pipeline, StudentDoc.class, Document.class);
+		List<Document> documents = aggregationResult.getMappedResults();
+		List<Long> res = documents.stream().map(d -> d.getLong("_id")).toList();
+		log.debug("worst {} students are {}", nStudents, res);
+		return res;
+	}
 }
