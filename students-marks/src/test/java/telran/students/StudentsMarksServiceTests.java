@@ -2,7 +2,6 @@ package telran.students;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -153,5 +152,12 @@ class StudentsMarksServiceTests {
 		List<Student> expected1 = List.of(students[2], students[5]);
 		assertIterableEquals(expected, studentsService.getStudentsMarksAmountBetween(2, 4));
 		assertIterableEquals(expected1, studentsService.getStudentsMarksAmountBetween(3, 6));
+	}
+
+	@Test
+	void getStudentMarksAtDatesTest() {
+		List<Mark> expected = List.of(new Mark(SUBJECT2, 100, DATE2), new Mark(SUBJECT3, 100, DATE3));
+		assertEquals(expected, studentsService.getStudentMarksAtDates(ID6, DATE1, DATE4));
+
 	}
 }

@@ -170,20 +170,8 @@ public class StudentsServiceImpl implements StudentsService {
 
 	@Override
 	public List<Mark> getStudentMarksSubject(long id, String subject) {
-		if (!studentRepo.existsById(id)) {
-			throw new StudentNotFoundException();
-		}
-		MatchOperation matchStudentOperation = Aggregation.match(Criteria.where("id").is(id));
-		UnwindOperation unwindOperation = Aggregation.unwind("marks");
 		MatchOperation matchSubject = Aggregation.match(Criteria.where("marks.subject").is(subject));
-		ProjectionOperation projectOperation = Aggregation.project("marks.subject", "marks.score", "marks.date");
-		Aggregation pipeline = Aggregation.newAggregation(matchStudentOperation, unwindOperation, matchSubject,
-				projectOperation);
-		var aggregationResult = mongoTemplate.aggregate(pipeline, StudentDoc.class, Document.class);
-		List<Document> documents = aggregationResult.getMappedResults();
-		log.debug("received {} documents", documents.size());
-		List<Mark> res = documents.stream().map(d -> new Mark(d.getString("subject"), d.getInteger("score"),
-				d.getDate("date").toInstant().atZone(ZoneId.systemDefault()).toLocalDate())).toList();
+		List<Mark> res = getMArksAggregation(id, matchSubject);
 		log.debug("marks of subject {} of student {} are {}", subject, id, res);
 		return res;
 	}
@@ -222,6 +210,7 @@ public class StudentsServiceImpl implements StudentsService {
 
 		List<IdPhone> idPhones = studentRepo.findStudentsMarksAmountBetween(min, max);
 		List<Student> res = idPhonesToStudents(idPhones);
+		log.debug("students having marks amount between {} and {} are {}", min, max, res);
 		return res;
 	}
 
@@ -231,7 +220,30 @@ public class StudentsServiceImpl implements StudentsService {
 		// of a given student (the same as getStudentsMarksSubject just different match
 		// operation
 		// think of DRY (Don't Repeat Yourself)
-		return null;
+		MatchOperation matchSubject = Aggregation
+				.match(Criteria.where("marks.date").gt(from.atStartOfDay()).lt(to.atStartOfDay()));
+		List<Mark> res = getMArksAggregation(id, matchSubject);
+		log.debug("student {} marks from date {} to date {} are {}", id, from, to, res);
+		return res;
+
+	}
+
+	private List<Mark> getMArksAggregation(long id, MatchOperation matchSubject) {
+		if (!studentRepo.existsById(id)) {
+			throw new StudentNotFoundException();
+		}
+		MatchOperation matchStudentOperation = Aggregation.match(Criteria.where("id").is(id));
+		UnwindOperation unwindOperation = Aggregation.unwind("marks");
+		MatchOperation matchSubjectReceived = matchSubject;
+		ProjectionOperation projectOperation = Aggregation.project("marks.subject", "marks.score", "marks.date");
+		Aggregation pipeline = Aggregation.newAggregation(matchStudentOperation, unwindOperation, matchSubjectReceived,
+				projectOperation);
+		var aggregationResult = mongoTemplate.aggregate(pipeline, StudentDoc.class, Document.class);
+		List<Document> documents = aggregationResult.getMappedResults();
+		log.debug("received {} documents", documents.size());
+		List<Mark> res = documents.stream().map(d -> new Mark(d.getString("subject"), d.getInteger("score"),
+				d.getDate("date").toInstant().atZone(ZoneId.systemDefault()).toLocalDate())).toList();
+		return res;
 	}
 
 	@Override
