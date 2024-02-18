@@ -2,6 +2,7 @@ package telran.students;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,110 +25,112 @@ class StudentsMarksServiceTests {
 	StudentRepo studentRepo;
 	@Autowired
 	TestDb testDb;
-
-	static final long ID8 = 8;
-	static final String PHONE8 = "058-1234567";
-	Student student8 = new Student(ID8, PHONE8);
-	Student studentUpdated = new Student(ID1, PHONE2);
-	Mark mark = new Mark(SUBJECT2, 70, DATE1);
-	List<Student> studentsMarksDate = List.of(students[0], students[1], students[2], students[5]);
-	List<Student> studentsGoodSubjectMarks = List.of(students[0], students[2], students[3], students[5]);
-	List<Student> studentsGoodSubjectMarks1 = List.of(students[0], students[5]);
-	List<Student> studentsAllGoodMarks = List.of(students[4], students[5]);
-	List<Student> studentsAllGoodMarks1 = List.of(students[0], students[1], students[2], students[3], students[4],
-			students[5]);
-	List<Student> studentsFewMarks = List.of(students[3], students[4], students[6]);
-	List<Student> studentsFewMarks1 = List.of(students[0], students[1], students[3], students[4], students[6]);
-
 	@BeforeEach
 	void setUp() {
 		testDb.createDb();
 	}
 
 	@Test
-
+	
 	void addStudentTest() {
-		// FIXME according to TestDb
-		assertEquals(student8, studentsService.addStudent(student8));
-		assertEquals(student8, studentRepo.findById(ID8).orElseThrow().build());
-		assertThrowsExactly(StudentIllegalStateException.class, () -> studentsService.addStudent(student8));
+		
+		assertEquals(studentNotExist, studentsService.addStudent(studentNotExist));
+		assertEquals(studentNotExist, studentRepo.findById(ID_NOT_EXIST).orElseThrow().build());
+		assertThrowsExactly(StudentIllegalStateException.class, ()->studentsService.addStudent(studentNotExist));
 	}
-
 	@Test
 
 	void updatePhoneNumberTest() {
-		// FIXME according to TestDb
-		assertEquals(studentUpdated, studentsService.updatePhoneNumber(ID1, PHONE2));
-		assertEquals(studentUpdated, studentRepo.findById(ID1).orElseThrow().build());
+		assertEquals(studentUpdated, studentsService.updatePhoneNumber(ID1, PHONE_NOT_EXIST));
+		assertEquals(PHONE_NOT_EXIST, studentRepo.findById(ID1).orElseThrow().getPhone());
 		assertThrowsExactly(StudentNotFoundException.class,
-				() -> studentsService.updatePhoneNumber(ID1 + 1000, PHONE2));
+				()->studentsService.updatePhoneNumber(ID1 + 1000, PHONE2));
 	}
-
 	@Test
-
+	
 	void addMarkTest() {
-		// FIXME according to TestDb
-		assertFalse(studentRepo.findById(ID1).orElseThrow().getMarks().contains(mark));
-		assertEquals(mark, studentsService.addMark(ID1, mark));
-		assertTrue(studentRepo.findById(ID1).orElseThrow().getMarks().contains(mark));
-		assertThrowsExactly(StudentNotFoundException.class, () -> studentsService.addMark(ID1 + 1000, mark));
-
+		
+		assertFalse(studentRepo.findById(ID1).orElseThrow().getMarks().contains(markNotExist));
+		assertEquals(markNotExist, studentsService.addMark(ID1, markNotExist));
+		assertTrue(studentRepo.findById(ID1).orElseThrow().getMarks().contains(markNotExist));
+		assertThrowsExactly(StudentNotFoundException.class,
+				()->studentsService.addMark(ID1 + 1000, markNotExist));
+		
 	}
-
 	@Test
 	void getStudentTest() {
 		assertEquals(students[0], studentsService.getStudent(ID1));
-		assertThrowsExactly(StudentNotFoundException.class, () -> studentsService.getStudent(100000));
+		assertThrowsExactly(StudentNotFoundException.class, ()->studentsService.getStudent(100000));
 	}
-
 	@Test
 	void getMarksTest() {
-		assertArrayEquals(testDb.getMarks()[0], studentsService.getMarks(ID1).toArray(Mark[]::new));
-		assertThrowsExactly(StudentNotFoundException.class, () -> studentsService.getMarks(100000));
+		assertArrayEquals(marks[0], studentsService.getMarks(ID1).toArray(Mark[]::new));
+		assertThrowsExactly(StudentNotFoundException.class, ()->studentsService.getMarks(100000));
 	}
-
 	@Test
 	void getStudentByPhoneNumberTest() {
 		assertEquals(students[0], studentsService.getStudentByPhoneNumber(PHONE1));
 	}
-
 	@Test
-	void getStudentsByPhonePrefix() {
+	void getStudentsByPhonePrefixTest() {
 		List<Student> expected = List.of(students[0], students[6]);
 		assertIterableEquals(expected, studentsService.getStudentsByPhonePrefix("051"));
 	}
-
+	@Test
+	void getStudentsMarksDateTest() {
+		List<Student> expected = List.of(students[2], students[3],students[5]);
+		assertIterableEquals(expected, studentsService.getStudentsMarksDate(DATE4));
+		assertTrue(studentsService.getStudentsMarksDate(DATE_NOT_EXIST).isEmpty());
+	}
+	@Test
+	void getStudentsMarksMonthYearTest() {
+		List<Student> expected = List.of(students[0], students[1],students[2],students[3],students[4],students[5]);
+		assertIterableEquals(expected, studentsService.getStudentsMarksMonthYear(2, 2024));
+		assertTrue(studentsService.getStudentsMarksMonthYear(2, 2020).isEmpty());
+	}
+	@Test
+	void getStudentsGoodSubjectMarkTest() {
+		List<Student> expected = List.of(students[5]);
+		assertIterableEquals(expected, studentsService.getStudentsGoodSubjectMark(SUBJECT1, 85));
+		assertTrue(studentsService.getStudentsGoodSubjectMark(SUBJECT_NOT_EXIST, 85).isEmpty());
+	}
 	@Test
 	void removeStudentTest() {
 		assertEquals(students[0], studentsService.removeStudent(ID1));
+		assertNull(studentRepo.findById(ID1).orElse(null));
 		assertThrowsExactly(StudentNotFoundException.class, () -> studentsService.removeStudent(ID1));
 	}
-
-	@Test
-	void getStudentsMarksDateTest() {
-		assertEquals(studentsMarksDate, studentsService.getStudentsMarksDate(DATE1));
-	}
-
-	@Test
-	void getStudentsMarksMonthYearTest() {
-		assertEquals(studentsMarksDate, studentsService.getStudentsMarksMonthYear(01, 2024));
-	}
-
-	@Test
-	void getStudentsGoodSubjectMarkTest() {
-		assertEquals(studentsGoodSubjectMarks, studentsService.getStudentsGoodSubjectMark(SUBJECT1, 60));
-		assertEquals(studentsGoodSubjectMarks1, studentsService.getStudentsGoodSubjectMark(SUBJECT2, 70));
-	}
-
 	@Test
 	void getStudentsAllGoodMarksTest() {
-		assertEquals(studentsAllGoodMarks, studentsService.getStudentsAllGoodMarks(80));
-		assertEquals(studentsAllGoodMarks1, studentsService.getStudentsAllGoodMarks(60));
+		List<Student> expected = List.of(students[4], students[5]);
+		assertIterableEquals(expected, studentsService.getStudentsAllGoodMarks(70));
+		assertTrue(studentsService.getStudentsAllGoodMarks(100).isEmpty());
+	}
+	@Test
+	void getStudentMarksSubjectTest() {
+		List<Mark> expected = List.of(new Mark(SUBJECT1,70,DATE1),
+			 new Mark(SUBJECT1,80, DATE2));
+		assertIterableEquals(expected, studentsService.getStudentMarksSubject(ID1, SUBJECT1));
+		assertTrue(studentsService.getStudentMarksSubject(ID1, SUBJECT3).isEmpty());
+		assertThrowsExactly(StudentNotFoundException.class, () -> studentsService.getStudentMarksSubject(ID1 + 1000, SUBJECT3) );
+	}
+	@Test
+	void getStudentsFewMarks() {
+		List<Student> expected = List.of(students[6]);
+		assertIterableEquals(expected, studentsService.getStudentsFewMarks(1));
+	}
+	@Test
+	void getStudentsAvgScoreGreaterTest() {
+		List<StudentAvgScore> expected = List.of(new StudentAvgScore(ID6, 100),
+				new StudentAvgScore(ID5, 95));
+		assertIterableEquals(expected, studentsService.getStudentsAvgScoreGreater(90));
+		
+	}
+	@Test
+	void getStudentsAllGoodMarksSubjectTest() {
+		List<Student> expected = List.of(students[4], students[5]);
+		assertIterableEquals(expected, studentsService.getStudentsAllGoodMarksSubject(SUBJECT4,80));
+//		assertTrue(studentsService.getStudentsAllGoodMarks(100).isEmpty());
 	}
 
-	@Test
-	void getStudentsFewMarksTest() {
-		assertEquals(studentsFewMarks, studentsService.getStudentsFewMarks(3));
-		assertEquals(studentsFewMarks1, studentsService.getStudentsFewMarks(4));
-	}
 }

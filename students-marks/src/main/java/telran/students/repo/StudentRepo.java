@@ -20,23 +20,26 @@ public interface StudentRepo extends MongoRepository<StudentDoc, Long> {
 
 	List<IdPhone> findByPhoneRegex(String regex);
 
-	@Query(value = "{ 'marks' : { $elemMatch: { 'date' : ?0 } } }", fields = "{id:1, phone:1}")
-	List<StudentDoc> findStudentsWithMarksOnDate(LocalDate date);
+	List<IdPhone> findByMarksDate(LocalDate date);
 
-//	@Query(value = "{ 'marks.date' : { $gte: ?0, $lte: ?1 } }", fields = "{id:1, phone:1}")
-//	List<StudentDoc> findStudentsWithMarksOnMonthAndYear(LocalDate startDate, LocalDate endDate);
-	@Query(value = "{ $expr: { $and: [ " +
-            "{ $eq: [ { $year: '$marks.date' }, ?1 ] }, " +
-            "{ $eq: [ { $month: '$marks.date' }, ?0 ] } ] } }", 
-    fields = "{id:1, phone:1}")
-List<StudentDoc> findStudentsWithMarksOnMonthAndYear(int month, int year );
-	
-	@Query(value = "{ 'marks' : {$elemMatch: { 'subject' : ?0 , 'score' : {$gt: ?1}} }}", fields = "{id:1, phone:1}")
-	List<StudentDoc> findStudentsWithGoodSubjectMark(String subject, int markThreshold);
+	List<IdPhone> findByMarksDateBetween(LocalDate firstDate, LocalDate lastDate);
 
-	@Query(value = "{ 'marks' : {$elemMatch: { 'score' : {$gt: ?0}} }}", fields = "{id:1, phone:1}")
-	List<StudentDoc> findStudentsWithAllGoodMarks(int markThreshold);
+	List<IdPhone> findByMarksSubjectAndMarksScoreGreaterThan(String subject, int markThreshold);
 
-	@Query(value = "{ $expr: { $lt: [ { $size: '$marks' }, ?0 ] } }", fields = "{id:1, phone:1}")
-	List<StudentDoc> findStudentsWithFewMarks(int nMarks);
+	/*******************/
+	@Query("{$and:[{marks:{$elemMatch:{score:{$gt:?0}}}},{marks:{$not:{$elemMatch:{score:{$lte:?0}}}}}]}")
+	List<IdPhone> findAllGoodMarks(int markThreshold);
+
+	/**********************************************************/
+	@Query("{$expr:{$lt:[{$size:$marks}, ?0]}}")
+	List<IdPhone> findFewMarks(int nMarks);
+
+	@Query("{" +
+	        "'$and': [" +
+	        "{'marks': {'$elemMatch': {'subject': ?0, 'score': {'$gt': ?1}}}}," +
+	        "{'marks': {'$not': {'$elemMatch': {'subject': ?0, 'score': {'$lte': ?1}}}}}" +
+	        "]" +
+	        "}")
+	List<IdPhone> findAllGoodMarksSubject(String subject, int thresholdScore);
+
 }

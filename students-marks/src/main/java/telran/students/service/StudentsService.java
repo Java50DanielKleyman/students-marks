@@ -53,4 +53,13 @@ public interface StudentsService {
 	 */
 	List<Student> getStudentsFewMarks(int nMarks);
 	/***************************/
+	List<Mark> getStudentMarksSubject(long id, String subject);
+	/*****************/
+	List<StudentAvgScore> getStudentsAvgScoreGreater(int avgThreshold);
+	//methods for HW #72
+	List<Student> getStudentsAllGoodMarksSubject(String subject, int thresholdScore);
+	List<Student> getStudentsMarksAmountBetween(int min, int max);
+	List<Mark> getStudentMarksAtDates(long id, LocalDate from, LocalDate to);
+	List<Long> getBestStudents(int nStudents);
+	List<Long> getWorstStudents(int nStudents);
 }
