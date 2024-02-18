@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import telran.students.dto.Mark;
+
 import telran.students.model.StudentDoc;
 
 public interface StudentRepo extends MongoRepository<StudentDoc, Long> {

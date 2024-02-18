@@ -160,4 +160,12 @@ class StudentsMarksServiceTests {
 		assertEquals(expected, studentsService.getStudentMarksAtDates(ID6, DATE1, DATE4));
 
 	}
+
+	@Test
+	void getBestStudentsTest() {
+		List<Long> expected = List.of(ID6);
+		List<Long> expected1 = List.of(ID6, ID5, ID2);
+		assertEquals(expected, studentsService.getBestStudents(1));
+		assertEquals(expected1, studentsService.getBestStudents(3));
+	}
 }

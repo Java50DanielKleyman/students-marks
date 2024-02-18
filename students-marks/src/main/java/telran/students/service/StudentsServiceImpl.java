@@ -253,7 +253,20 @@ public class StudentsServiceImpl implements StudentsService {
 		// consider aggregation method count() instead of avg() that we have used at CW
 		// #72
 		// and LimitOperation as additional AggregationOperation
-		return null;
+
+		UnwindOperation unwindOperation = Aggregation.unwind("marks");
+		MatchOperation matchOperation = Aggregation.match(Criteria.where("marks.score").gt(80));
+		GroupOperation groupOperation = Aggregation.group("id").count().as("bestStudents");
+		SortOperation sortOperation = Aggregation.sort(Direction.DESC, "bestStudents");
+		LimitOperation limitOperation = Aggregation.limit(nStudents);
+		ProjectionOperation projectOperation = Aggregation.project("id");
+		Aggregation pipeline = Aggregation.newAggregation(unwindOperation, matchOperation, groupOperation,
+				sortOperation, limitOperation, projectOperation);
+		var aggregationResult = mongoTemplate.aggregate(pipeline, StudentDoc.class, Document.class);
+		List<Document> documents = aggregationResult.getMappedResults();
+		List<Long> res = documents.stream().map(d -> d.getLong("_id")).toList();
+		log.debug("bets {} students with most scores greater than 80 are {}", nStudents, res);
+		return res;
 	}
 
 	@Override
