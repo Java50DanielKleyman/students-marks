@@ -280,13 +280,25 @@ public class StudentsServiceImpl implements StudentsService {
 		// ProjectionOperation for adding new fields with computed values from
 		// AggregationExpression
 
-		UnwindOperation unwindOperation = Aggregation.unwind("marks", true);
-		AggregationExpression sumExpression = AccumulatorOperators.Sum.sumOf("marks.score");
-		ProjectionOperation projectOperation = Aggregation.project("id").and(sumExpression).as("TotalScore");
+//		UnwindOperation unwindOperation = Aggregation.unwind("marks", true);
+//		AggregationExpression sumExpression = AccumulatorOperators.Sum.sumOf("marks.score");
+//		ProjectionOperation projectOperation = Aggregation.project("id").and(sumExpression).as("TotalScore");
+//		SortOperation sortOperation = Aggregation.sort(Direction.ASC, "TotalScore");
+//		LimitOperation limitOperation = Aggregation.limit(nStudents);
+//		Aggregation pipeline = Aggregation.newAggregation(unwindOperation, projectOperation, sortOperation,
+//				limitOperation);
+//		var aggregationResult = mongoTemplate.aggregate(pipeline, StudentDoc.class, Document.class);
+//		List<Document> documents = aggregationResult.getMappedResults();
+//		List<Long> res = documents.stream().map(d -> d.getLong("_id")).toList();
+//		log.debug("worst {} students are {}", nStudents, res);
+
+		UnwindOperation unwindOperation = Aggregation.unwind("marks");			
+		GroupOperation groupOperation = Aggregation.group("id").sum("$marks.score").as("TotalScore");
 		SortOperation sortOperation = Aggregation.sort(Direction.ASC, "TotalScore");
 		LimitOperation limitOperation = Aggregation.limit(nStudents);
-		Aggregation pipeline = Aggregation.newAggregation(unwindOperation, projectOperation, sortOperation,
-				limitOperation);
+		ProjectionOperation projectOperation = Aggregation.project("id");
+		Aggregation pipeline = Aggregation.newAggregation(unwindOperation, groupOperation, sortOperation,
+				limitOperation, projectOperation);
 		var aggregationResult = mongoTemplate.aggregate(pipeline, StudentDoc.class, Document.class);
 		List<Document> documents = aggregationResult.getMappedResults();
 		List<Long> res = documents.stream().map(d -> d.getLong("_id")).toList();
